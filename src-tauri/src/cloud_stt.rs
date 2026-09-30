@@ -43,12 +43,14 @@ pub fn cloud_stt_providers() -> Vec<CloudSttProvider> {
             label: "Google Gemini".into(),
             kind: CloudSttKind::Gemini,
             base_url: "https://generativelanguage.googleapis.com/v1beta".into(),
-            default_model: "gemini-2.5-flash".into(),
+            // `-latest` aliases stay available to new keys; pinned versions
+            // (e.g. gemini-2.5-flash) get withdrawn for new users without notice.
+            default_model: "gemini-flash-lite-latest".into(),
             models: vec![
-                "gemini-2.5-flash".into(),
                 "gemini-flash-lite-latest".into(),
                 "gemini-3.5-flash-lite".into(),
                 "gemini-flash-latest".into(),
+                "gemini-2.5-flash".into(),
             ],
             key_url: "https://aistudio.google.com/apikey".into(),
         },
@@ -183,6 +185,7 @@ fn encode_wav(samples: &[f32]) -> Result<Vec<u8>> {
 }
 
 /// Encoded audio ready to upload.
+#[derive(Clone)]
 struct AudioPayload {
     bytes: Vec<u8>,
     mime: &'static str,
@@ -267,11 +270,53 @@ async fn error_from_response(provider: &str, resp: reqwest::Response) -> anyhow:
         })
         .unwrap_or_else(|| body.chars().take(300).collect());
     let hint = match status.as_u16() {
-        401 | 403 => " (check the API key; OpenAI and Gemini also refuse some regions — use a VPN or a proxy base URL)",
-        429 => " (rate limit or no credit left on the account)",
+        401 | 403 => "Ключ не подошёл, или сервис не принимает запросы из вашей страны: проверьте ключ, включите VPN или укажите прокси в поле «Адрес API».",
+        402 => "На балансе аккаунта закончились средства: пополните его у провайдера (для Gemini — ai.studio/projects → Billing) или возьмите бесплатный ключ.",
+        404 => "Эта модель недоступна для вашего ключа — выберите другую в настройках распознавания.",
+        429 => "Слишком много запросов или исчерпан лимит/баланс — подождите минуту или проверьте баланс.",
+        s if s >= 500 => "Сервис перегружен или временно недоступен — попробуйте ещё раз через минуту.",
         _ => "",
     };
-    anyhow!("{} returned {}: {}{}", provider, status, detail, hint)
+    ModelHttpError {
+        status: status.as_u16(),
+        message: format!("{} — {}: {}\n{}", provider, status, detail, hint)
+            .trim_end()
+            .to_string(),
+    }
+    .into()
+}
+
+/// A provider answered with a non-2xx status.
+#[derive(Debug)]
+struct ModelHttpError {
+    status: u16,
+    message: String,
+}
+
+impl std::fmt::Display for ModelHttpError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.message)
+    }
+}
+
+impl std::error::Error for ModelHttpError {}
+
+fn http_status(e: &anyhow::Error) -> Option<u16> {
+    e.downcast_ref::<ModelHttpError>().map(|h| h.status)
+}
+
+/// Transport failures (dropped VPN connection, TLS EOF, timeout) are worth
+/// one silent retry; HTTP errors from the provider are not.
+fn is_transport_error(e: &anyhow::Error) -> bool {
+    e.chain().any(|c| c.downcast_ref::<reqwest::Error>().is_some())
+}
+
+async fn transcribe_once(r: &Resolved, audio: AudioPayload) -> Result<String> {
+    match r.provider.kind {
+        CloudSttKind::OpenAiCompatible => transcribe_openai(r, audio).await,
+        CloudSttKind::ElevenLabs => transcribe_elevenlabs(r, audio).await,
+        CloudSttKind::Gemini => transcribe_gemini(r, audio).await,
+    }
 }
 
 /// Transcribe `samples` (16 kHz mono) with the configured cloud provider.
@@ -291,14 +336,45 @@ pub async fn transcribe(settings: &AppSettings, samples: &[f32]) -> Result<Strin
         audio.mime
     );
 
-    let text = match r.provider.kind {
-        CloudSttKind::OpenAiCompatible => transcribe_openai(&r, audio).await?,
-        CloudSttKind::ElevenLabs => transcribe_elevenlabs(&r, audio).await?,
-        CloudSttKind::Gemini => transcribe_gemini(&r, audio).await?,
-    };
+    // Try the chosen model first; if the provider says the model is gone
+    // (404), walk the provider's suggested list instead of failing.
+    let mut models = vec![r.model.clone()];
+    for m in &r.provider.models {
+        if !models.contains(m) {
+            models.push(m.clone());
+        }
+    }
 
-    debug!("Cloud STT finished in {:?}", started.elapsed());
-    Ok(text.trim().to_string())
+    let mut r = r;
+    let mut last_err: Option<anyhow::Error> = None;
+    for model in models {
+        r.model = model;
+        let mut result = transcribe_once(&r, audio.clone()).await;
+        if let Err(e) = &result {
+            if is_transport_error(e) {
+                log::warn!("Cloud STT network error, retrying once: {}", e);
+                tokio::time::sleep(Duration::from_millis(400)).await;
+                result = transcribe_once(&r, audio.clone()).await;
+            }
+        }
+        match result {
+            Ok(text) => {
+                debug!("Cloud STT ({}) finished in {:?}", r.model, started.elapsed());
+                return Ok(text.trim().to_string());
+            }
+            Err(e) if http_status(&e) == Some(404) => {
+                log::warn!("Model '{}' unavailable, trying the next one: {}", r.model, e);
+                last_err = Some(e);
+            }
+            Err(e) if is_transport_error(&e) => {
+                return Err(e.context(
+                    "Нет связи с сервисом распознавания (обрыв сети или VPN). Попробуйте ещё раз.",
+                ));
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    Err(last_err.unwrap_or_else(|| anyhow!("No model available")))
 }
 
 async fn transcribe_openai(r: &Resolved, audio: AudioPayload) -> Result<String> {

@@ -790,7 +790,7 @@ fn default_model_for_provider(provider_id: &str) -> String {
         return APPLE_INTELLIGENCE_DEFAULT_MODEL_ID.to_string();
     }
     match provider_id {
-        "gemini" => "gemini-2.5-flash".to_string(),
+        "gemini" => "gemini-flash-lite-latest".to_string(),
         "openai" => "gpt-4.1-mini".to_string(),
         "groq" => "llama-3.3-70b-versatile".to_string(),
         _ => String::new(),
@@ -888,7 +888,12 @@ fn ensure_post_process_defaults(settings: &mut AppSettings) -> bool {
         let default_model = default_model_for_provider(&provider.id);
         match settings.post_process_models.get_mut(&provider.id) {
             Some(existing) => {
-                if existing.is_empty() && !default_model.is_empty() {
+                // 0.1.0 shipped gemini-2.5-flash, which Google no longer
+                // serves to new keys; move those installs to the alias.
+                if provider.id == "gemini" && existing == "gemini-2.5-flash" {
+                    *existing = default_model.clone();
+                    changed = true;
+                } else if existing.is_empty() && !default_model.is_empty() {
                     *existing = default_model.clone();
                     changed = true;
                 }
