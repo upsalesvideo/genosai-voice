@@ -101,7 +101,7 @@
     },
     "permissions": {
       "title": "需要權限",
-      "description": "Handy 需要一些權限才能正常運作",
+      "description": "Genosai Voice 需要一些權限才能正常運作",
       "microphone": {
         "title": "麥克風存取",
         "description": "需要聽取您的語音進行轉錄"
@@ -118,6 +118,18 @@
         "checkFailed": "檢查權限失敗，請重試",
         "requestFailed": "請求權限失敗，請重試"
       }
+    },
+    "cloud": {
+      "subtitle": "Hold the shortcut, speak, release — clean text appears wherever your cursor is. Connect a recognition service with your own API key.",
+      "provider": "Recognition service",
+      "recommended": "recommended",
+      "apiKey": "API key",
+      "whereKey": "Where to get a {{provider}} key",
+      "privacy": "The key stays on this computer. Audio goes straight to the service you chose — not through our servers.",
+      "continue": "Check and continue",
+      "checking": "Checking the key…",
+      "keyRequired": "Paste an API key first",
+      "useLocal": "No key? Use an offline model on this computer"
     }
   },
   "modelSelector": {
@@ -161,7 +173,7 @@
     "general": {
       "title": "一般",
       "shortcut": {
-        "title": "Handy 快捷鍵",
+        "title": "Genosai Voice 快捷鍵",
         "description": "設定啟動語音轉文字錄製的鍵盤快捷鍵",
         "loading": "載入快捷鍵中...",
         "none": "未設定快捷鍵",
@@ -226,7 +238,7 @@
       "searchPlaceholder": "依名稱搜尋模型…",
       "rescan": {
         "label": "重新掃描",
-        "tooltip": "重新掃描在 Handy 之外新增到模型資料夾或 Hugging Face 快取中的模型"
+        "tooltip": "重新掃描在 Genosai Voice 之外新增到模型資料夾或 Hugging Face 快取中的模型"
       }
     },
     "sound": {
@@ -293,11 +305,11 @@
       },
       "autostart": {
         "label": "開機啟動",
-        "description": "登入電腦時自動啟動 Handy"
+        "description": "登入電腦時自動啟動 Genosai Voice"
       },
       "showTrayIcon": {
         "label": "顯示系統匣圖示",
-        "description": "在系統匣中顯示 Handy 圖示"
+        "description": "在系統匣中顯示 Genosai Voice 圖示"
       },
       "overlay": {
         "style": {
@@ -493,7 +505,7 @@
       },
       "updateChecks": {
         "label": "檢查更新",
-        "description": "自動檢查 Handy 的新版本",
+        "description": "自動檢查 Genosai Voice 的新版本",
         "lockedDescription": "已被系統設定停用 (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -571,7 +583,7 @@
       },
       "keyboardDiagnostic": {
         "title": "鍵盤診斷",
-        "description": "檢查鍵盤事件是否能送達 Handy。只會記錄事件數量，絕不記錄您按了哪些按鍵。",
+        "description": "檢查鍵盤事件是否能送達 Genosai Voice。只會記錄事件數量，絕不記錄您按了哪些按鍵。",
         "run": "執行 10 秒診斷",
         "running": "正在監聽… 請按幾次您的快捷鍵（例如 Option+Space）",
         "secureInputLabel": "Secure Input",
@@ -585,7 +597,7 @@
         "mouse": "滑鼠",
         "verdictBlocked": "Secure Input 正在阻擋按鍵事件——在問題解決前，包含一般按鍵的快捷鍵無法運作。",
         "verdictSuspicious": "收到了修飾鍵事件，但沒有按鍵事件——即使 Secure Input 回報為已停用，仍有程式在抑制按鍵。請在 GitHub 上回報此問題。",
-        "verdictOk": "按鍵事件正常送達 Handy。",
+        "verdictOk": "按鍵事件正常送達 Genosai Voice。",
         "verdictNoEvents": "未擷取到任何事件——測試期間您有按鍵嗎？",
         "failed": "診斷失敗：{{error}}"
       },
@@ -608,33 +620,91 @@
       "title": "關於",
       "version": {
         "title": "版本",
-        "description": "Handy 的目前版本"
+        "description": "Genosai Voice 的目前版本"
       },
       "appDataDirectory": {
         "title": "應用程式資料目錄",
-        "description": "Handy 儲存資料的位置"
+        "description": "Genosai Voice 儲存資料的位置"
       },
       "sourceCode": {
         "title": "原始碼",
-        "description": "檢視原始碼並參與貢獻",
+        "description": "Genosai Voice source code on GitHub",
         "button": "在 GitHub 上檢視"
       },
       "supportDevelopment": {
-        "title": "支持開發",
-        "description": "幫助我們繼續開發 Handy",
-        "button": "捐贈"
+        "title": "Website",
+        "description": "Guides, news and new versions",
+        "button": "Open website"
       },
       "acknowledgments": {
         "title": "致謝",
         "ggml": {
           "title": "ggml",
           "description": "針對 OpenAI Whisper 自動語音辨識模型的高效能推理引擎",
-          "details": "Handy 使用 ggml 進行快速的本機語音轉文字處理。感謝 Georgi Gerganov 和貢獻者們的傑出工作"
+          "details": "Genosai Voice 使用 ggml 進行快速的本機語音轉文字處理。感謝 Georgi Gerganov 和貢獻者們的傑出工作"
+        },
+        "handy": {
+          "title": "Handy (MIT License)",
+          "description": "Genosai Voice is built on the open-source Handy project by CJ Pais. Thank you!",
+          "button": "Handy on GitHub"
         }
       },
       "whatsNewUpdates": {
         "label": "顯示新功能",
-        "description": "Handy 更新後顯示版本資訊"
+        "description": "Genosai Voice 更新後顯示版本資訊"
+      }
+    },
+    "cloud": {
+      "title": "Recognition",
+      "enabled": {
+        "title": "Cloud recognition (your API key)",
+        "description": "Send the recording to a speech-recognition service using your own API key. Turn off to use a local offline model instead."
+      },
+      "provider": {
+        "title": "Service",
+        "description": "Gemini works for both recognition and AI correction with a single key."
+      },
+      "apiKey": {
+        "title": "API key",
+        "description": "Stored only on this computer. The same key is used for AI correction if that uses the same service.",
+        "placeholder": "Paste your API key",
+        "getKey": "Get a key"
+      },
+      "model": {
+        "title": "Model",
+        "description": "Pick a suggested model or type any model name on the right.",
+        "custom": "Custom model name"
+      },
+      "language": {
+        "title": "Language",
+        "description": "Setting the language explicitly improves accuracy.",
+        "options": {
+          "auto": "Auto-detect",
+          "ru": "Russian",
+          "en": "English",
+          "uk": "Ukrainian",
+          "kk": "Kazakh",
+          "be": "Belarusian",
+          "de": "German",
+          "es": "Spanish",
+          "fr": "French"
+        }
+      },
+      "baseUrl": {
+        "title": "API address",
+        "description": "Change only if you use a proxy or a self-hosted OpenAI-compatible endpoint."
+      },
+      "correction": {
+        "title": "AI correction on every dictation",
+        "description": "Fix spelling, punctuation and filler words with the model configured under Post Processing."
+      },
+      "test": {
+        "title": "Check connection",
+        "description": "Sends half a second of silence to verify the key and network.",
+        "button": "Check",
+        "running": "Checking…",
+        "ok": "Connection works — you can dictate",
+        "failed": "Connection failed: {{error}}"
       }
     }
   },
@@ -663,7 +733,7 @@
     "noOptionsFound": "未找到選項"
   },
   "accessibility": {
-    "permissionsDescription": "Handy 需要輔助使用權限才能輸入轉錄的文字",
+    "permissionsDescription": "Genosai Voice 需要輔助使用權限才能輸入轉錄的文字",
     "openSettings": "開啟系統設定"
   },
   "errors": {
@@ -686,11 +756,11 @@
   },
   "appLanguage": {
     "title": "應用程式語言",
-    "description": "變更 Handy 介面的語言"
+    "description": "變更 Genosai Voice 介面的語言"
   },
   "theme": {
     "title": "應用程式主題",
-    "description": "選擇 Handy 跟隨系統主題，或維持淺色或深色",
+    "description": "選擇 Genosai Voice 跟隨系統主題，或維持淺色或深色",
     "options": {
       "system": "跟隨系統",
       "light": "淺色",
@@ -702,7 +772,7 @@
     "processing": "處理中..."
   },
   "whatsNew": {
-    "title": "Handy v{{version}} 新功能"
+    "title": "Genosai Voice v{{version}} 新功能"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} 可能正在阻擋 1 個快捷鍵",

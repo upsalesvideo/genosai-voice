@@ -101,7 +101,7 @@
     },
     "permissions": {
       "title": "Permisos requeridos",
-      "description": "Handy necesita algunos permisos para funcionar correctamente.",
+      "description": "Genosai Voice necesita algunos permisos para funcionar correctamente.",
       "microphone": {
         "title": "Acceso al micrófono",
         "description": "Necesario para escuchar tu voz para la transcripción."
@@ -118,6 +118,18 @@
         "checkFailed": "Error al verificar permisos. Por favor, inténtalo de nuevo.",
         "requestFailed": "Error al solicitar permiso. Por favor, inténtalo de nuevo."
       }
+    },
+    "cloud": {
+      "subtitle": "Hold the shortcut, speak, release — clean text appears wherever your cursor is. Connect a recognition service with your own API key.",
+      "provider": "Recognition service",
+      "recommended": "recommended",
+      "apiKey": "API key",
+      "whereKey": "Where to get a {{provider}} key",
+      "privacy": "The key stays on this computer. Audio goes straight to the service you chose — not through our servers.",
+      "continue": "Check and continue",
+      "checking": "Checking the key…",
+      "keyRequired": "Paste an API key first",
+      "useLocal": "No key? Use an offline model on this computer"
     }
   },
   "modelSelector": {
@@ -175,13 +187,13 @@
       "searchPlaceholder": "Buscar modelos por nombre…",
       "rescan": {
         "label": "Volver a escanear",
-        "tooltip": "Vuelve a escanear en busca de modelos añadidos a la carpeta de modelos o a la caché de Hugging Face fuera de Handy"
+        "tooltip": "Vuelve a escanear en busca de modelos añadidos a la carpeta de modelos o a la caché de Hugging Face fuera de Genosai Voice"
       }
     },
     "general": {
       "title": "General",
       "shortcut": {
-        "title": "Atajos de Handy",
+        "title": "Atajos de Genosai Voice",
         "description": "Configura atajos de teclado para activar la grabación de voz a texto",
         "loading": "Cargando atajos...",
         "none": "No hay atajos configurados",
@@ -293,11 +305,11 @@
       },
       "autostart": {
         "label": "Iniciar al arranque",
-        "description": "Iniciar Handy automáticamente cuando inicies sesión en tu computadora."
+        "description": "Iniciar Genosai Voice automáticamente cuando inicies sesión en tu computadora."
       },
       "showTrayIcon": {
         "label": "Mostrar icono de bandeja",
-        "description": "Mostrar el icono de Handy en la bandeja del sistema."
+        "description": "Mostrar el icono de Genosai Voice en la bandeja del sistema."
       },
       "overlay": {
         "style": {
@@ -493,7 +505,7 @@
       },
       "updateChecks": {
         "label": "Buscar actualizaciones",
-        "description": "Buscar automáticamente nuevas versiones de Handy",
+        "description": "Buscar automáticamente nuevas versiones de Genosai Voice",
         "lockedDescription": "Deshabilitado por la configuración del sistema (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -571,7 +583,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Diagnóstico del teclado",
-        "description": "Comprueba si los eventos de teclado llegan a Handy. Solo se registra el número de eventos, nunca qué teclas pulsas.",
+        "description": "Comprueba si los eventos de teclado llegan a Genosai Voice. Solo se registra el número de eventos, nunca qué teclas pulsas.",
         "run": "Ejecutar diagnóstico de 10 s",
         "running": "Escuchando… pulsa tu atajo varias veces (p. ej. Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -585,7 +597,7 @@
         "mouse": "Ratón",
         "verdictBlocked": "Secure Input está bloqueando los eventos de teclado: los atajos que incluyen una tecla normal no pueden funcionar hasta que se resuelva.",
         "verdictSuspicious": "Llegaron eventos de modificadores, pero ningún evento de tecla: algo está suprimiendo las teclas aunque Secure Input aparezca como desactivado. Por favor, repórtalo en GitHub.",
-        "verdictOk": "Los eventos de teclado llegan a Handy con normalidad.",
+        "verdictOk": "Los eventos de teclado llegan a Genosai Voice con normalidad.",
         "verdictNoEvents": "No se capturó ningún evento: ¿pulsaste alguna tecla durante la prueba?",
         "failed": "El diagnóstico falló: {{error}}"
       },
@@ -608,33 +620,91 @@
       "title": "Acerca de",
       "version": {
         "title": "Versión",
-        "description": "Versión actual de Handy"
+        "description": "Versión actual de Genosai Voice"
       },
       "appDataDirectory": {
         "title": "Directorio de datos de la aplicación",
-        "description": "Ubicación donde Handy almacena sus datos"
+        "description": "Ubicación donde Genosai Voice almacena sus datos"
       },
       "sourceCode": {
         "title": "Código fuente",
-        "description": "Ver código fuente y contribuir",
+        "description": "Genosai Voice source code on GitHub",
         "button": "Ver en GitHub"
       },
       "supportDevelopment": {
-        "title": "Apoyar el desarrollo",
-        "description": "Ayúdanos a continuar construyendo Handy",
-        "button": "Donar"
+        "title": "Website",
+        "description": "Guides, news and new versions",
+        "button": "Open website"
       },
       "acknowledgments": {
         "title": "Reconocimientos",
         "ggml": {
           "title": "ggml",
           "description": "Biblioteca de tensores de alto rendimiento para inferencia de aprendizaje automático en el dispositivo",
-          "details": "El habla a texto local de Handy está construido sobre transcribe.cpp y ggml. Gracias al increíble trabajo de Georgi Gerganov y colaboradores."
+          "details": "El habla a texto local de Genosai Voice está construido sobre transcribe.cpp y ggml. Gracias al increíble trabajo de Georgi Gerganov y colaboradores."
+        },
+        "handy": {
+          "title": "Handy (MIT License)",
+          "description": "Genosai Voice is built on the open-source Handy project by CJ Pais. Thank you!",
+          "button": "Handy on GitHub"
         }
       },
       "whatsNewUpdates": {
         "label": "Mostrar novedades",
-        "description": "Mostrar notas de la versión después de las actualizaciones de Handy"
+        "description": "Mostrar notas de la versión después de las actualizaciones de Genosai Voice"
+      }
+    },
+    "cloud": {
+      "title": "Recognition",
+      "enabled": {
+        "title": "Cloud recognition (your API key)",
+        "description": "Send the recording to a speech-recognition service using your own API key. Turn off to use a local offline model instead."
+      },
+      "provider": {
+        "title": "Service",
+        "description": "Gemini works for both recognition and AI correction with a single key."
+      },
+      "apiKey": {
+        "title": "API key",
+        "description": "Stored only on this computer. The same key is used for AI correction if that uses the same service.",
+        "placeholder": "Paste your API key",
+        "getKey": "Get a key"
+      },
+      "model": {
+        "title": "Model",
+        "description": "Pick a suggested model or type any model name on the right.",
+        "custom": "Custom model name"
+      },
+      "language": {
+        "title": "Language",
+        "description": "Setting the language explicitly improves accuracy.",
+        "options": {
+          "auto": "Auto-detect",
+          "ru": "Russian",
+          "en": "English",
+          "uk": "Ukrainian",
+          "kk": "Kazakh",
+          "be": "Belarusian",
+          "de": "German",
+          "es": "Spanish",
+          "fr": "French"
+        }
+      },
+      "baseUrl": {
+        "title": "API address",
+        "description": "Change only if you use a proxy or a self-hosted OpenAI-compatible endpoint."
+      },
+      "correction": {
+        "title": "AI correction on every dictation",
+        "description": "Fix spelling, punctuation and filler words with the model configured under Post Processing."
+      },
+      "test": {
+        "title": "Check connection",
+        "description": "Sends half a second of silence to verify the key and network.",
+        "button": "Check",
+        "running": "Checking…",
+        "ok": "Connection works — you can dictate",
+        "failed": "Connection failed: {{error}}"
       }
     }
   },
@@ -663,7 +733,7 @@
     "noOptionsFound": "No se encontraron opciones"
   },
   "accessibility": {
-    "permissionsDescription": "Handy necesita permisos de accesibilidad para escribir texto transcrito.",
+    "permissionsDescription": "Genosai Voice necesita permisos de accesibilidad para escribir texto transcrito.",
     "openSettings": "Abrir Ajustes del Sistema"
   },
   "errors": {
@@ -686,11 +756,11 @@
   },
   "appLanguage": {
     "title": "Idioma de la aplicación",
-    "description": "Cambia el idioma de la interfaz de Handy"
+    "description": "Cambia el idioma de la interfaz de Genosai Voice"
   },
   "theme": {
     "title": "Tema de la aplicación",
-    "description": "Elige si Handy sigue el tema del sistema o permanece claro u oscuro",
+    "description": "Elige si Genosai Voice sigue el tema del sistema o permanece claro u oscuro",
     "options": {
       "system": "Sistema",
       "light": "Claro",
@@ -702,7 +772,7 @@
     "processing": "Procesando..."
   },
   "whatsNew": {
-    "title": "Nuevo en Handy v{{version}}"
+    "title": "Nuevo en Genosai Voice v{{version}}"
   },
   "secureInput": {
     "blockedWithCulprit_one": "{{name}} puede estar bloqueando 1 atajo",

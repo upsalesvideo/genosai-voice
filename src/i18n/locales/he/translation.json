@@ -101,7 +101,7 @@
     },
     "permissions": {
       "title": "נדרשות הרשאות",
-      "description": "Handy צריך כמה הרשאות כדי לעבוד כמו שצריך.",
+      "description": "Genosai Voice צריך כמה הרשאות כדי לעבוד כמו שצריך.",
       "microphone": {
         "title": "גישה למיקרופון",
         "description": "נדרש כדי לשמוע את הקול שלך לצורך תמלול."
@@ -118,6 +118,18 @@
         "checkFailed": "בדיקת ההרשאות נכשלה. נסה שוב.",
         "requestFailed": "בקשת ההרשאה נכשלה. נסה שוב."
       }
+    },
+    "cloud": {
+      "subtitle": "Hold the shortcut, speak, release — clean text appears wherever your cursor is. Connect a recognition service with your own API key.",
+      "provider": "Recognition service",
+      "recommended": "recommended",
+      "apiKey": "API key",
+      "whereKey": "Where to get a {{provider}} key",
+      "privacy": "The key stays on this computer. Audio goes straight to the service you chose — not through our servers.",
+      "continue": "Check and continue",
+      "checking": "Checking the key…",
+      "keyRequired": "Paste an API key first",
+      "useLocal": "No key? Use an offline model on this computer"
     }
   },
   "modelSelector": {
@@ -161,7 +173,7 @@
     "general": {
       "title": "כללי",
       "shortcut": {
-        "title": "קיצורי מקשים של Handy",
+        "title": "קיצורי מקשים של Genosai Voice",
         "description": "הגדר קיצורי מקשים כדי להפעיל הקלטה ותמלול דיבור",
         "loading": "טוען קיצורי מקשים...",
         "none": "לא הוגדרו קיצורי מקשים",
@@ -226,7 +238,7 @@
       "searchPlaceholder": "חיפוש מודלים לפי שם…",
       "rescan": {
         "label": "סריקה מחדש",
-        "tooltip": "סריקה מחדש לאיתור מודלים שנוספו לתיקיית המודלים או למטמון של Hugging Face מחוץ ל-Handy"
+        "tooltip": "סריקה מחדש לאיתור מודלים שנוספו לתיקיית המודלים או למטמון של Hugging Face מחוץ ל-Genosai Voice"
       }
     },
     "sound": {
@@ -293,11 +305,11 @@
       },
       "autostart": {
         "label": "הפעל עם עליית המערכת",
-        "description": "הפעל את Handy אוטומטית כשאתה מתחבר למחשב."
+        "description": "הפעל את Genosai Voice אוטומטית כשאתה מתחבר למחשב."
       },
       "showTrayIcon": {
         "label": "הצג אייקון במגש",
-        "description": "הצג את האייקון של Handy במגש המערכת."
+        "description": "הצג את האייקון של Genosai Voice במגש המערכת."
       },
       "overlay": {
         "style": {
@@ -493,7 +505,7 @@
       },
       "updateChecks": {
         "label": "בדוק עדכונים",
-        "description": "בדוק אוטומטית אם קיימות גרסאות חדשות של Handy",
+        "description": "בדוק אוטומטית אם קיימות גרסאות חדשות של Genosai Voice",
         "lockedDescription": "מושבת על ידי תצורת המערכת (HANDY_DISABLE_UPDATER)"
       },
       "soundTheme": {
@@ -571,7 +583,7 @@
       },
       "keyboardDiagnostic": {
         "title": "אבחון מקלדת",
-        "description": "בודק אם אירועי מקלדת מגיעים ל-Handy. נרשם רק מספר האירועים — לעולם לא אילו מקשים הקשת.",
+        "description": "בודק אם אירועי מקלדת מגיעים ל-Genosai Voice. נרשם רק מספר האירועים — לעולם לא אילו מקשים הקשת.",
         "run": "הרצת אבחון של 10 שניות",
         "running": "מאזין… הקש על קיצור המקשים שלך כמה פעמים (למשל Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -585,7 +597,7 @@
         "mouse": "עכבר",
         "verdictBlocked": "Secure Input חוסם אירועי מקשים — קיצורים הכוללים מקש רגיל לא יוכלו לפעול עד שהבעיה תיפתר.",
         "verdictSuspicious": "הגיעו אירועים של מקשי החלפה אך לא אירועי מקשים — משהו מדכא מקשים למרות ש-Secure Input מדווח כמושבת. אנא דווח על כך ב-GitHub.",
-        "verdictOk": "אירועי מקשים מגיעים ל-Handy כרגיל.",
+        "verdictOk": "אירועי מקשים מגיעים ל-Genosai Voice כרגיל.",
         "verdictNoEvents": "לא נקלטו אירועים — האם הקשת על מקשים במהלך הבדיקה?",
         "failed": "האבחון נכשל: {{error}}"
       },
@@ -608,33 +620,91 @@
       "title": "אודות",
       "version": {
         "title": "גרסה",
-        "description": "הגרסה הנוכחית של Handy"
+        "description": "הגרסה הנוכחית של Genosai Voice"
       },
       "appDataDirectory": {
         "title": "תיקיית נתוני אפליקציה",
-        "description": "המיקום שבו Handy שומר את הנתונים שלו"
+        "description": "המיקום שבו Genosai Voice שומר את הנתונים שלו"
       },
       "sourceCode": {
         "title": "קוד מקור",
-        "description": "צפה בקוד המקור ותרום",
+        "description": "Genosai Voice source code on GitHub",
         "button": "צפה ב-GitHub"
       },
       "supportDevelopment": {
-        "title": "תמיכה בפיתוח",
-        "description": "עזור לנו להמשיך לבנות את Handy",
-        "button": "תרומה"
+        "title": "Website",
+        "description": "Guides, news and new versions",
+        "button": "Open website"
       },
       "acknowledgments": {
         "title": "תודות",
         "ggml": {
           "title": "ggml",
           "description": "הסקה מהירה לביצועים גבוהים עבור מודל זיהוי הדיבור Whisper של OpenAI",
-          "details": "Handy משתמש ב-ggml לתמלול מהיר ומקומי. תודה לעבודה המדהימה של Georgi Gerganov וכל התורמים."
+          "details": "Genosai Voice משתמש ב-ggml לתמלול מהיר ומקומי. תודה לעבודה המדהימה של Georgi Gerganov וכל התורמים."
+        },
+        "handy": {
+          "title": "Handy (MIT License)",
+          "description": "Genosai Voice is built on the open-source Handy project by CJ Pais. Thank you!",
+          "button": "Handy on GitHub"
         }
       },
       "whatsNewUpdates": {
         "label": "הצג מה חדש",
-        "description": "הצג הערות גרסה לאחר עדכוני Handy"
+        "description": "הצג הערות גרסה לאחר עדכוני Genosai Voice"
+      }
+    },
+    "cloud": {
+      "title": "Recognition",
+      "enabled": {
+        "title": "Cloud recognition (your API key)",
+        "description": "Send the recording to a speech-recognition service using your own API key. Turn off to use a local offline model instead."
+      },
+      "provider": {
+        "title": "Service",
+        "description": "Gemini works for both recognition and AI correction with a single key."
+      },
+      "apiKey": {
+        "title": "API key",
+        "description": "Stored only on this computer. The same key is used for AI correction if that uses the same service.",
+        "placeholder": "Paste your API key",
+        "getKey": "Get a key"
+      },
+      "model": {
+        "title": "Model",
+        "description": "Pick a suggested model or type any model name on the right.",
+        "custom": "Custom model name"
+      },
+      "language": {
+        "title": "Language",
+        "description": "Setting the language explicitly improves accuracy.",
+        "options": {
+          "auto": "Auto-detect",
+          "ru": "Russian",
+          "en": "English",
+          "uk": "Ukrainian",
+          "kk": "Kazakh",
+          "be": "Belarusian",
+          "de": "German",
+          "es": "Spanish",
+          "fr": "French"
+        }
+      },
+      "baseUrl": {
+        "title": "API address",
+        "description": "Change only if you use a proxy or a self-hosted OpenAI-compatible endpoint."
+      },
+      "correction": {
+        "title": "AI correction on every dictation",
+        "description": "Fix spelling, punctuation and filler words with the model configured under Post Processing."
+      },
+      "test": {
+        "title": "Check connection",
+        "description": "Sends half a second of silence to verify the key and network.",
+        "button": "Check",
+        "running": "Checking…",
+        "ok": "Connection works — you can dictate",
+        "failed": "Connection failed: {{error}}"
       }
     }
   },
@@ -663,7 +733,7 @@
     "noOptionsFound": "לא נמצאו אפשרויות"
   },
   "accessibility": {
-    "permissionsDescription": "Handy צריך הרשאות נגישות כדי להקליד את הטקסט המתומלל.",
+    "permissionsDescription": "Genosai Voice צריך הרשאות נגישות כדי להקליד את הטקסט המתומלל.",
     "openSettings": "פתח את הגדרות המערכת"
   },
   "errors": {
@@ -686,11 +756,11 @@
   },
   "appLanguage": {
     "title": "שפת האפליקציה",
-    "description": "שנה את שפת הממשק של Handy"
+    "description": "שנה את שפת הממשק של Genosai Voice"
   },
   "theme": {
     "title": "ערכת נושא של האפליקציה",
-    "description": "בחר אם Handy יעקוב אחר ערכת הנושא של המערכת או יישאר בהיר או כהה",
+    "description": "בחר אם Genosai Voice יעקוב אחר ערכת הנושא של המערכת או יישאר בהיר או כהה",
     "options": {
       "system": "מערכת",
       "light": "בהיר",
@@ -702,7 +772,7 @@
     "processing": "מעבד..."
   },
   "whatsNew": {
-    "title": "חדש ב-Handy v{{version}}"
+    "title": "חדש ב-Genosai Voice v{{version}}"
   },
   "secureInput": {
     "blockedWithCulprit_one": "ייתכן ש-{{name}} חוסם קיצור דרך אחד",

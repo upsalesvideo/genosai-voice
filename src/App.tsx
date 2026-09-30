@@ -18,7 +18,10 @@ import "./App.css";
 import AccessibilityPermissions from "./components/AccessibilityPermissions";
 import SecureInputWarning from "./components/SecureInputWarning";
 import Footer from "./components/footer";
-import Onboarding, { AccessibilityOnboarding } from "./components/onboarding";
+import Onboarding, {
+  AccessibilityOnboarding,
+  CloudOnboarding,
+} from "./components/onboarding";
 import {
   DebugSettings,
   type OnboardingPreviewStep,
@@ -31,7 +34,7 @@ import { useSettingsStore } from "./stores/settingsStore";
 import { commands } from "@/bindings";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
-type OnboardingStep = "accessibility" | "model" | "done";
+type OnboardingStep = "accessibility" | "cloud" | "model" | "done";
 
 // Stable identity so preview effects do not re-run due to callback changes.
 const NOOP = () => {};
@@ -74,6 +77,7 @@ function App() {
   const isShowingOnboarding =
     onboardingPreview !== null ||
     onboardingStep === "accessibility" ||
+    onboardingStep === "cloud" ||
     onboardingStep === "model";
 
   // Classic scrollbars consume layout space. Reserve a matching gutter on the
@@ -284,7 +288,7 @@ function App() {
   const handleAccessibilityComplete = () => {
     // Returning users already have models, skip to main app
     // New users need to select a model
-    setOnboardingStep(isReturningUser ? "done" : "model");
+    setOnboardingStep(isReturningUser ? "done" : "cloud");
   };
 
   const handleModelSelected = () => {
@@ -346,6 +350,13 @@ function App() {
   } else if (onboardingStep === "accessibility") {
     content = (
       <AccessibilityOnboarding onComplete={handleAccessibilityComplete} />
+    );
+  } else if (onboardingStep === "cloud") {
+    content = (
+      <CloudOnboarding
+        onDone={() => setOnboardingStep("done")}
+        onUseLocal={() => setOnboardingStep("model")}
+      />
     );
   } else if (onboardingStep === "model") {
     content = <Onboarding onModelSelected={handleModelSelected} />;

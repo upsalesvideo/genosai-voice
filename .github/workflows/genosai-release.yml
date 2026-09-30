@@ -1,0 +1,108 @@
+name: "Genosai Voice Release"
+
+# Builds macOS (Apple Silicon + Intel) and Windows installers and publishes
+# them as a GitHub Release. Trigger: push a tag vX.Y.Z matching the version in
+# src-tauri/tauri.conf.json, or run manually.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release-id: ${{ steps.create-release.outputs.result }}
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Get version from tauri.conf.json
+        id: get-version
+        shell: bash
+        run: |
+          VERSION=$(grep -o '"version": "[^"]*"' src-tauri/tauri.conf.json | head -1 | cut -d'"' -f4)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create or reuse draft release
+        id: create-release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const tag = `v${{ steps.get-version.outputs.version }}`;
+            const { owner, repo } = context.repo;
+            const releases = await github.paginate(github.rest.repos.listReleases, { owner, repo });
+            const existing = releases.find(r => r.tag_name === tag);
+            if (existing) {
+              // Rebuild: drop old assets so the new upload doesn't collide.
+              for (const asset of existing.assets) {
+                await github.rest.repos.deleteReleaseAsset({ owner, repo, asset_id: asset.id });
+              }
+              if (!existing.draft) {
+                await github.rest.repos.updateRelease({ owner, repo, release_id: existing.id, draft: true });
+              }
+              return existing.id;
+            }
+            const { data } = await github.rest.repos.createRelease({
+              owner, repo,
+              tag_name: tag,
+              name: `Genosai Voice ${tag}`,
+              target_commitish: context.sha,
+              draft: true,
+              prerelease: false,
+              body: "Скачайте установщик для своей системы:\n\n- **Mac с Apple Silicon (M1–M5):** `GenosaiVoice_aarch64.dmg`\n- **Mac с Intel:** `GenosaiVoice_x64.dmg`\n- **Windows 10/11:** `GenosaiVoice_x64-setup.exe`\n\nИнструкция по установке: https://voice.bogatushin.ru",
+            });
+            return data.id;
+
+  build:
+    permissions:
+      contents: write
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-26"
+            args: "--target aarch64-apple-darwin"
+            target: "aarch64-apple-darwin"
+          - platform: "macos-latest"
+            args: "--target x86_64-apple-darwin"
+            target: "x86_64-apple-darwin"
+          - platform: "windows-latest"
+            args: "--bundles nsis"
+            target: "x86_64-pc-windows-msvc"
+    uses: ./.github/workflows/build.yml
+    with:
+      platform: ${{ matrix.platform }}
+      target: ${{ matrix.target }}
+      build-args: ${{ matrix.args }}
+      sign-binaries: false
+      asset-prefix: ""
+      asset-name-pattern: "GenosaiVoice_[arch][setup][ext]"
+      upload-artifacts: false
+      release-id: ${{ needs.create-release.outputs.release-id }}
+    secrets: inherit
+
+  publish:
+    permissions:
+      contents: write
+    needs: [create-release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ needs.create-release.outputs.release-id }},
+              draft: false,
+              make_latest: "true",
+            });

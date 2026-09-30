@@ -1,8 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Handy",
-  "version": "0.9.7",
-  "identifier": "com.pais.handy",
+  "productName": "Genosai Voice",
+  "mainBinaryName": "genosai-voice",
+  "version": "0.1.0",
+  "identifier": "io.genosai.voice",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
@@ -17,7 +18,9 @@
       "assetProtocol": {
         "enable": true,
         "scope": {
-          "allow": ["**"],
+          "allow": [
+            "**"
+          ],
           "requireLiteralLeadingDot": false
         }
       }
@@ -27,7 +30,9 @@
     "active": true,
     "createUpdaterArtifacts": true,
     "targets": "all",
-    "resources": ["resources/**/*"],
+    "resources": [
+      "resources/**/*"
+    ],
     "license": "MIT",
     "icon": [
       "icons/32x32.png",
@@ -45,9 +50,12 @@
     },
     "linux": {
       "deb": {
-        "depends": ["libgtk-layer-shell0", "libopenblas0"],
+        "depends": [
+          "libgtk-layer-shell0",
+          "libopenblas0"
+        ],
         "files": {
-          "/usr/lib/Handy": "transcribe-libs"
+          "/usr/lib/GenosaiVoice": "transcribe-libs"
         }
       },
       "rpm": {
@@ -59,7 +67,7 @@
           "type": "none"
         },
         "files": {
-          "/usr/lib/Handy": "transcribe-libs"
+          "/usr/lib/GenosaiVoice": "transcribe-libs"
         }
       },
       "appimage": {
@@ -70,17 +78,19 @@
       }
     },
     "windows": {
-      "signCommand": "trusted-signing-cli -e https://eus.codesigning.azure.net/ -a CJ-Signing -c cjpais-dev -d Handy %1",
       "nsis": {
         "template": "nsis/installer.nsi"
       }
-    }
+    },
+    "publisher": "Genosai",
+    "copyright": "© 2026 Genosai. Based on Handy (MIT).",
+    "shortDescription": "Voice dictation with AI correction"
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBQjcyMDk1MjA2NjAxRjkKUldUNUFXWWdsU0MzdXRRZi8zYzhqV2FaNUVDbDd2Rk5VM1IvWWowVXdmRFNKQ1BrMXF5RFFsLy8K",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDA4NkYxRUE3OTlGNzNBNEUKUldST092ZVpweDV2Q0M4Z1BVYlYzTVl2T1V4ck1UczNMbjNOY2x4TXRRa0pJQVJHTlNMcWxXMkMK",
       "endpoints": [
-        "https://github.com/cjpais/Handy/releases/latest/download/latest.json"
+        "https://github.com/upsalesvideo/genosai-voice/releases/latest/download/latest.json"
       ]
     }
   }

@@ -7,6 +7,7 @@ mod autostart;
 mod catalog;
 pub mod cli;
 mod clipboard;
+mod cloud_stt;
 mod commands;
 mod helpers;
 mod input;
@@ -757,6 +758,15 @@ pub fn run(cli_args: CliArgs) {
             commands::transcription::get_model_load_status,
             commands::transcription::unload_model_manually,
             commands::history::get_history_entries,
+            commands::cloud::get_cloud_stt_providers,
+            commands::cloud::change_cloud_stt_enabled_setting,
+            commands::cloud::set_cloud_stt_provider,
+            commands::cloud::change_cloud_stt_api_key_setting,
+            commands::cloud::change_cloud_stt_model_setting,
+            commands::cloud::change_cloud_stt_base_url_setting,
+            commands::cloud::change_always_post_process_setting,
+            commands::cloud::test_cloud_stt,
+            commands::cloud::complete_cloud_onboarding,
             commands::history::toggle_history_entry_saved,
             commands::history::get_audio_file_path,
             commands::history::delete_history_entry,
@@ -943,7 +953,7 @@ pub fn run(cli_args: CliArgs) {
             // for portable mode (redirects WebView2 cache to portable Data dir)
             let mut win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
-                    .title("Handy")
+                    .title("Genosai Voice")
                     .inner_size(680.0, 570.0)
                     .min_inner_size(680.0, 570.0)
                     .resizable(true)
