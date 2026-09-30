@@ -790,7 +790,7 @@ fn default_model_for_provider(provider_id: &str) -> String {
         return APPLE_INTELLIGENCE_DEFAULT_MODEL_ID.to_string();
     }
     match provider_id {
-        "gemini" => "gemini-flash-latest".to_string(),
+        "gemini" => "gemini-2.5-flash".to_string(),
         "openai" => "gpt-4.1-mini".to_string(),
         "groq" => "llama-3.3-70b-versatile".to_string(),
         _ => String::new(),

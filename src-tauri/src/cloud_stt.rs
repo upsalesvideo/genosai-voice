@@ -43,11 +43,12 @@ pub fn cloud_stt_providers() -> Vec<CloudSttProvider> {
             label: "Google Gemini".into(),
             kind: CloudSttKind::Gemini,
             base_url: "https://generativelanguage.googleapis.com/v1beta".into(),
-            default_model: "gemini-flash-latest".into(),
+            default_model: "gemini-2.5-flash".into(),
             models: vec![
-                "gemini-flash-latest".into(),
-                "gemini-flash-lite-latest".into(),
                 "gemini-2.5-flash".into(),
+                "gemini-flash-lite-latest".into(),
+                "gemini-3.5-flash-lite".into(),
+                "gemini-flash-latest".into(),
             ],
             key_url: "https://aistudio.google.com/apikey".into(),
         },
@@ -181,6 +182,68 @@ fn encode_wav(samples: &[f32]) -> Result<Vec<u8>> {
     Ok(cursor.into_inner())
 }
 
+/// Encoded audio ready to upload.
+struct AudioPayload {
+    bytes: Vec<u8>,
+    mime: &'static str,
+    file_name: &'static str,
+}
+
+/// Compress to 32 kbps MP3: ~8x smaller than WAV, which cuts upload time on
+/// slow links (VPNs) several-fold with no measurable accuracy loss. Every
+/// supported provider accepts MP3. Falls back to WAV if encoding fails.
+fn encode_audio(samples: &[f32]) -> Result<AudioPayload> {
+    match encode_mp3(samples) {
+        Ok(bytes) if !bytes.is_empty() => Ok(AudioPayload {
+            bytes,
+            mime: "audio/mpeg",
+            file_name: "audio.mp3",
+        }),
+        other => {
+            if let Err(e) = other {
+                log::warn!("MP3 encoding failed, sending WAV instead: {}", e);
+            }
+            Ok(AudioPayload {
+                bytes: encode_wav(samples)?,
+                mime: "audio/wav",
+                file_name: "audio.wav",
+            })
+        }
+    }
+}
+
+fn encode_mp3(samples: &[f32]) -> Result<Vec<u8>> {
+    use mp3lame_encoder::{Bitrate, Builder, FlushNoGap, MonoPcm, Quality};
+
+    let mut builder = Builder::new().ok_or_else(|| anyhow!("LAME init failed"))?;
+    builder
+        .set_num_channels(1)
+        .map_err(|e| anyhow!("mp3 channels: {}", e))?;
+    builder
+        .set_sample_rate(16_000)
+        .map_err(|e| anyhow!("mp3 sample rate: {}", e))?;
+    builder
+        .set_brate(Bitrate::Kbps32)
+        .map_err(|e| anyhow!("mp3 bitrate: {}", e))?;
+    builder
+        .set_quality(Quality::Good)
+        .map_err(|e| anyhow!("mp3 quality: {}", e))?;
+    let mut encoder = builder.build().map_err(|e| anyhow!("mp3 build: {}", e))?;
+
+    let pcm: Vec<i16> = samples
+        .iter()
+        .map(|s| (s.clamp(-1.0, 1.0) * i16::MAX as f32) as i16)
+        .collect();
+    let mut out = Vec::with_capacity(mp3lame_encoder::max_required_buffer_size(pcm.len()) + 7200);
+    encoder
+        .encode_to_vec(MonoPcm(pcm.as_slice()), &mut out)
+        .map_err(|e| anyhow!("mp3 encode: {}", e))?;
+    encoder
+        .flush_to_vec::<FlushNoGap>(&mut out)
+        .map_err(|e| anyhow!("mp3 flush: {}", e))?;
+    Ok(out)
+}
+
 fn http_client() -> Result<reqwest::Client> {
     reqwest::Client::builder()
         .connect_timeout(Duration::from_secs(10))
@@ -217,30 +280,31 @@ pub async fn transcribe(settings: &AppSettings, samples: &[f32]) -> Result<Strin
         return Ok(String::new());
     }
     let r = resolve(settings)?;
-    let wav = encode_wav(samples)?;
+    let audio = encode_audio(samples)?;
     let started = std::time::Instant::now();
     debug!(
-        "Cloud STT: provider={} model={} audio={:.1}s wav={}KB",
+        "Cloud STT: provider={} model={} audio={:.1}s upload={}KB ({})",
         r.provider.id,
         r.model,
         samples.len() as f64 / 16_000.0,
-        wav.len() / 1024
+        audio.bytes.len() / 1024,
+        audio.mime
     );
 
     let text = match r.provider.kind {
-        CloudSttKind::OpenAiCompatible => transcribe_openai(&r, wav).await?,
-        CloudSttKind::ElevenLabs => transcribe_elevenlabs(&r, wav).await?,
-        CloudSttKind::Gemini => transcribe_gemini(&r, wav).await?,
+        CloudSttKind::OpenAiCompatible => transcribe_openai(&r, audio).await?,
+        CloudSttKind::ElevenLabs => transcribe_elevenlabs(&r, audio).await?,
+        CloudSttKind::Gemini => transcribe_gemini(&r, audio).await?,
     };
 
     debug!("Cloud STT finished in {:?}", started.elapsed());
     Ok(text.trim().to_string())
 }
 
-async fn transcribe_openai(r: &Resolved, wav: Vec<u8>) -> Result<String> {
-    let part = reqwest::multipart::Part::bytes(wav)
-        .file_name("audio.wav")
-        .mime_str("audio/wav")?;
+async fn transcribe_openai(r: &Resolved, audio: AudioPayload) -> Result<String> {
+    let part = reqwest::multipart::Part::bytes(audio.bytes)
+        .file_name(audio.file_name)
+        .mime_str(audio.mime)?;
     let mut form = reqwest::multipart::Form::new()
         .part("file", part)
         .text("model", r.model.clone())
@@ -269,10 +333,10 @@ async fn transcribe_openai(r: &Resolved, wav: Vec<u8>) -> Result<String> {
         .ok_or_else(|| anyhow!("{}: response has no text", r.provider.label))
 }
 
-async fn transcribe_elevenlabs(r: &Resolved, wav: Vec<u8>) -> Result<String> {
-    let part = reqwest::multipart::Part::bytes(wav)
-        .file_name("audio.wav")
-        .mime_str("audio/wav")?;
+async fn transcribe_elevenlabs(r: &Resolved, audio: AudioPayload) -> Result<String> {
+    let part = reqwest::multipart::Part::bytes(audio.bytes)
+        .file_name(audio.file_name)
+        .mime_str(audio.mime)?;
     let mut form = reqwest::multipart::Form::new()
         .part("file", part)
         .text("model_id", r.model.clone())
@@ -319,20 +383,30 @@ If there is no speech, output nothing.",
     s
 }
 
-async fn transcribe_gemini(r: &Resolved, wav: Vec<u8>) -> Result<String> {
-    let audio_b64 = base64::engine::general_purpose::STANDARD.encode(&wav);
+/// Gemini 2.x takes a thinking budget; Gemini 3+ and the `-latest` aliases
+/// take a thinking level instead. Either way: think as little as possible.
+fn gemini_thinking_off(model: &str) -> serde_json::Value {
+    if model.starts_with("gemini-2") {
+        serde_json::json!({ "thinkingBudget": 0 })
+    } else {
+        serde_json::json!({ "thinkingLevel": "minimal" })
+    }
+}
+
+async fn transcribe_gemini(r: &Resolved, audio: AudioPayload) -> Result<String> {
+    let audio_b64 = base64::engine::general_purpose::STANDARD.encode(&audio.bytes);
     let model = r.model.trim_start_matches("models/");
     let body = serde_json::json!({
         "contents": [{
             "role": "user",
             "parts": [
-                { "inline_data": { "mime_type": "audio/wav", "data": audio_b64 } },
+                { "inline_data": { "mime_type": audio.mime, "data": audio_b64 } },
                 { "text": gemini_instruction(r) }
             ]
         }],
         "generationConfig": {
             "temperature": 0,
-            "thinkingConfig": { "thinkingBudget": 0 }
+            "thinkingConfig": gemini_thinking_off(model)
         }
     });
 
@@ -399,6 +473,17 @@ mod tests {
         assert_eq!(&wav[0..4], b"RIFF");
         assert_eq!(&wav[8..12], b"WAVE");
         assert_eq!(wav.len(), 44 + 16_000 * 2);
+    }
+
+    #[test]
+    fn mp3_is_much_smaller_than_wav() {
+        let tone: Vec<f32> = (0..16_000 * 3)
+            .map(|i| ((i as f32) * 0.07).sin() * 0.3)
+            .collect();
+        let mp3 = encode_mp3(&tone).unwrap();
+        let wav = encode_wav(&tone).unwrap();
+        assert!(!mp3.is_empty());
+        assert!(mp3.len() * 4 < wav.len(), "mp3={} wav={}", mp3.len(), wav.len());
     }
 
     #[test]
