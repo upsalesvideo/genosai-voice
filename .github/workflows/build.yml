@@ -512,7 +512,8 @@ jobs:
           chmod +x "$tools_dir/linuxdeploy-${arch}.AppImage"
           "$tools_dir/linuxdeploy-${arch}.AppImage" --appimage-extract-and-run --version
 
-      - name: Build with Tauri
+      - name: Build with Tauri (signed)
+        if: inputs.sign-binaries
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -538,6 +539,25 @@ jobs:
           LINUXDEPLOY_EXCLUDED_LIBRARIES: ${{ contains(inputs.platform, 'ubuntu') && 'libvulkan.so*;libwayland-client.so*' || '' }}
           # linuxdeploy passes this to appimagetool, which writes it as
           # X-AppImage-Version for desktop integration tools such as Gear Lever.
+          LINUXDEPLOY_OUTPUT_VERSION: ${{ contains(inputs.platform, 'ubuntu') && steps.get-version.outputs.version || '' }}
+        with:
+          tagName: ${{ inputs.release-id && format('v{0}', steps.get-version.outputs.version) || '' }}
+          releaseName: ${{ inputs.release-id && format('v{0}', steps.get-version.outputs.version) || '' }}
+          releaseId: ${{ inputs.release-id }}
+          assetNamePattern: ${{ steps.patch-release-name.outputs.platform }}
+          args: ${{ inputs.build-args }}
+
+      # Without OS code signing: Tauri treats an *empty* APPLE_CERTIFICATE as
+      # "import this certificate" and fails, so these vars must be absent, not
+      # blank. macOS falls back to ad-hoc signing ("-" in tauri.conf.json).
+      - name: Build with Tauri (unsigned)
+        if: ${{ !inputs.sign-binaries }}
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          LINUXDEPLOY_EXCLUDED_LIBRARIES: ${{ contains(inputs.platform, 'ubuntu') && 'libvulkan.so*;libwayland-client.so*' || '' }}
           LINUXDEPLOY_OUTPUT_VERSION: ${{ contains(inputs.platform, 'ubuntu') && steps.get-version.outputs.version || '' }}
         with:
           tagName: ${{ inputs.release-id && format('v{0}', steps.get-version.outputs.version) || '' }}
